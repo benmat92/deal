@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Edit Deal{% endblock %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+  {% if user.id == deal.author.id %}
+
+    <h1>Edit Deal</h1>
+    <br/>
+    <div class="mb-3">
+    <form method ="POST">
+      {% csrf_token %}
+      {{ form.media }}
+      {{ form.as_p }}
+      <button class="btn btn-primary">Update</button>
+    </div>
+    {% else %}
+    Sorry doesn't exist
+  {% endif %}
+
+{% else %}
+
+Gotta login first!
+
+{% endif %}
+
+{% endblock %}

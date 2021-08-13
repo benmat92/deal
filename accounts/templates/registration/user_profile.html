@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'catalog/style.css' %}">
+
+<h1>User Profile</h1>
+
+<br/><br/>
+<div class="card mb-3">
+  <div class="row g-0">
+    <div class="col-md-2">
+{% if page_user.user.profile.profile_pic %}
+    <img src="{{ page_user.user.profile.profile_pic.url }}" width="128" height="128" maxclass="img-fluid rounded-start">
+{% else %}
+    <img src="{% static 'catalog/images/default_profile.png' %}" width="128" height="128" maxclass="img-fluid rounded-start">
+{% endif %}
+    </div>
+    <div class="col-md-10">
+      <div class="card-body">
+        <h5 class="card-title"><a href="{% url 'show_profile_page' page_user.user.profile.id %}">{{ page_user.user.username }}</a></h5>
+
+        <p class="card-text">{{ page_user.user.profile.bio }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+<br/><br/>
+{% if user.id == profile.user.id %}
+  <a href="{% url 'edit_profile' %}">Edit Settings</a>
+  <br/>
+  <a href="{% url 'edit_profile_page' page_user.user.profile.id %}">Edit Profile Page</a>
+{% endif %}
+
+{% endblock %}

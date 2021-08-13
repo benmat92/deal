@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile Page{% endblock %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+  {% if user.id == profile.user.id %}
+    <h1>Edit Profile Page</h1>
+    <br/>
+    <div class="mb-3">
+    <div class="col-md-4">
+
+    <form method ="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <label>Bio:</label>
+    {{ form.bio }}
+    <br/>
+      <label>Profile pic:</label>
+    {{ form.profile_pic }}
+    <br/><br/>
+      <label>Website Url:</label>
+    {{ form.website_url }}
+    <br/>
+      <label>Facebook url:</label>
+    {{ form.facebook_url }}
+    <br/>
+      <label>Pinterest url:</label>
+    {{ form.pinterest_url }}
+    <br/>
+
+      <button class="btn btn-primary">Update</button>
+    </div>
+  {% endif %}
+
+{% else %}
+
+Gotta login first!
+{% endif %}
+{% endblock %}

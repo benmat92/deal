@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'catalog/style.css' %}">
+
+<h1>Deals</h1>
+
+<br/>
+
+<div class="row row-cols-1 row-cols-md-4 g-4">
+  {% for deal in object_list|slice:":8" %}
+  <div class="col">
+    <div class="card h-100" style="width: 19rem;"">
+      <div class="text-center">
+        <a href="{% url 'deal_details' deal.pk %}">
+          {% if deal.header_image %}
+            <img src="{{ deal.header_image.url }}" width="100" height="100" maxclass="img-fluid rounded-start" alt="...">
+          {% else %}
+            <img src="{% static 'catalog/images/default_profile.png' %}" width="100" height="100" maxclass="img-fluid rounded-start">
+          {% endif %}
+          <div class="card-body">
+            {{ deal.title|slice:":25" }}<br/> <strong>${{ deal.price }}</strong>
+          </div>
+        </a>
+          <div class="card-footer">
+            <small class="text-muted">{{ deal.total_likes }} Likes</small>
+            <img src="{% static 'catalog/images/gray_house.png' %}" width="25" height="25" maxclass="img-fluid rounded-start">
+          </div>
+        </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<br/>
+<div class="row row-cols-1 row-cols-md-6 g-4">
+  {% for deal in object_list|slice:"9:20" %}
+  <div class="col">
+    <div class="card h-100">
+      <div class="text-center">
+        <a href="{% url 'deal_details' deal.pk %}">
+          {% if deal.header_image %}
+            <img src="{{ deal.header_image.url }}" width="100" height="100" maxclass="img-fluid rounded-start" alt="...">
+          {% else %}
+            <img src="{% static 'catalog/images/default_profile.png' %}" width="100" height="100" maxclass="img-fluid rounded-start">
+          {% endif %}
+          <div class="card-body">
+            {{ deal.title|slice:":25" }}<br/> <strong>${{ deal.price }}</strong>
+          </div>
+        </a>
+          <div class="card-footer">
+            <small class="text-muted">{{ deal.total_likes }} Likes</small>
+            <img src="{% static 'catalog/images/gray_house.png' %}" width="25" height="25" maxclass="img-fluid rounded-start">
+          </div>
+        </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+
+{% for deal in object_list %}
+    <li><a href="{% url 'deal_details' deal.pk %}">{{ deal.title }} ${{ deal.price }}</a></li>
+
+{% endfor %}
+</ul>
+
+
+{% endblock %}

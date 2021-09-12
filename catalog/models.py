@@ -59,7 +59,8 @@ class Deal(models.Model):
     summary = RichTextField(blank=True, null=True)
     url = models.CharField('URL', max_length=250)
     category = models.ManyToManyField(Category)
-    likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='deals')
+    likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='deals', default=None, blank=True)
+    like_count = models.BigIntegerField(default ='0')
 
 
 

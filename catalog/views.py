@@ -4,9 +4,11 @@ from .models import Deal, Category, Comment
 import datetime
 from .forms import DealForm, EditForm, CommentForm
 from django.urls import reverse_lazy, reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
+
 # Create your views here.
 
+"""
 def LikeView(request, pk):
     deal = get_object_or_404(Deal, id=request.POST.get('deal_id'))
     liked=False
@@ -17,7 +19,29 @@ def LikeView(request, pk):
         deal.likes.add(request.user)
         liked = True
     return HttpResponseRedirect(reverse('deal_details', args=[str(pk)]))
+"""
 
+def like(request, pk):
+    result = ''
+    if request.POST.get('action') =='post':
+        id = request.POST.get('postid')
+        deal = get_object_or_404(Deal, id=id)
+        liked=False
+        if deal.likes.filter(id=request.user.id).exists():
+            deal.likes.remove(request.user)
+            deal.like_count -= 1
+            liked = False
+            result = deal.like_count
+            deal.save()
+        else:
+            deal.likes.add(request.user)
+            deal.like_count += 1
+            liked = True
+            result = deal.like_count
+            deal.save()
+        return JsonResponse({'result': result,})
+    else:
+        return JsonResponse({'result': result,})
 
 class CommentView(CreateView):
     model = Comment
@@ -44,7 +68,21 @@ class HomeView(ListView):
     def get_context_data(self, *args, **kwargs):
         cat_menu = Category.objects.all()
         context = super(HomeView, self).get_context_data(*args, **kwargs)
+
+    #    stuff = get_object_or_404(Deal, id=kwargs.get('id'))
+    #    total_likes = stuff.like_count
+    #    liked = False
+    #    if stuff.likes.filter(id=self.request.user.id).exists():
+    #        liked = True
+        deals = Deal.objects.all()
+
+        for deal in deals:
+            liked = False
+            if deal.likes.filter(id=self.request.user.id).exists():
+                liked = True
         context["cat_menu"] = cat_menu
+        context["liked"] = liked
+
         return context
 def CategoryView(request, cats):
 #    print("Querying for category: " + cats)
@@ -65,7 +103,7 @@ class DealDetailView(DetailView):
         context = super(DealDetailView, self).get_context_data(*args, **kwargs)
 
         stuff = get_object_or_404(Deal, id = self.kwargs['pk'])
-        total_likes = stuff.total_likes()
+        total_likes = stuff.like_count
 
         liked = False
         if stuff.likes.filter(id=self.request.user.id).exists():
@@ -73,7 +111,7 @@ class DealDetailView(DetailView):
         context ['comment'] = Comment.objects.all()
         context['form'] = CommentForm()
         context["cat_menu"] = cat_menu
-        context["total_likes"] = total_likes
+        #context["total_likes"] = total_likes
         context["liked"] = liked
         return context
 

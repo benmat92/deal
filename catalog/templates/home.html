@@ -25,13 +25,87 @@
         </a>
           <div class="card-footer">
             <small class="text-muted">{{ deal.total_likes }} Likes</small>
-            <img src="{% static 'catalog/images/gray_house.png' %}" width="25" height="25" maxclass="img-fluid rounded-start">
+            <form action = "{% url 'like_deal' deal.id %}" method="POST" class= 'like-form' id='{{deal.id}}'>
+              {% csrf_token %}
+              <input type="hidden" name="postid" value={{deal.id}}>
+                  <span class="" id="like_count">{{deal.like_count}}</span>
+                <button type="submit" class="like-button" value={{deal.id}}>
+                  {% if user.is_authenticated %}
+                    {% if liked %}
+                      <i class="fas fa-heart" style="background-color: white; font-size: 1.5em; margin-left: 5px;"></i>
+                    {% else %}
+                      <i class="far fa-heart" style="background-color: white; font-size: 1.5em; margin-left: 5px;"></i>
+                    {% endif %}
+                  {% else %}
+                  {% endif %}
+
+                </button>
+            </form>
+<!--
+            <div class="d-flex">
+              {% if user.is_authenticated %}
+                {% if liked %}
+                  <span class="" id="like_count">{{deal.like_count}}</span>
+                  <button class="btn btn-link text-dark p-0 border-0 btn-outline-link shadow-none" id="like-button" value="{{ deal.id }}">
+                    <i class="fas fa-heart" style="background-color: white; font-size: 1.5em; margin-left: 5px;"></i>
+                  </button>
+                {% else %}
+                  <span class="" id="like_count">{{deal.like_count}}</span>
+                  <button class="btn btn-link text-dark p-0 border-0 btn-outline-link shadow-none" id="like-button" value="{{ deal.id }}">
+                    <i class="far fa-heart" style="background-color: white; font-size: 1.5em; margin-left: 5px;"></i>
+                  </button>
+                {% endif %}
+              {% else %}
+                <div class="pr-2">
+                <span class="" id="like_count">{{deal.like_count}}</span>
+                <a href="{% url 'login' %}" class="btn btn-link text-dark p-0 border-0 btn-outline-light"
+                  value="{{deal.id}}">
+                  <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-heart" fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                      d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+                  </svg>
+                </a>
+              </div>
+              {% endif %}
+              -->
+            </div>
           </div>
         </div>
     </div>
   </div>
   {% endfor %}
+
 </div>
+<br/>
+<br/>
+
+<div class="row row-cols-1 row-cols-md-4 g-4">
+    {% for deal in object_list|slice:":8" %}
+      <div class="col">
+        <div class="card mb-3" style="max-width: 540px;">
+          <div class="row g-0">
+            <div class="col-md-4">
+              <a href="{% url 'deal_details' deal.pk %}">
+                {% if deal.header_image %}
+                  <img src="{{ deal.header_image.url }}" width="150" height="150" class="img-fluid rounded-start" alt="...">
+                {% else %}
+                  <img src="{% static 'catalog/images/default_profile.png' %}" width="100" height="100" maxclass="img-fluid rounded-start">
+                {% endif %}
+              </a>
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title">{{ deal.title|slice:":25" }}<br/><strong>${{ deal.price }}</strong></h5>
+                <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+</div>
+
 <br/>
 <div class="row row-cols-1 row-cols-md-6 g-4">
   {% for deal in object_list|slice:"9:20" %}
@@ -57,7 +131,27 @@
   </div>
   {% endfor %}
 </div>
+<br/>
+<br/>
 
+{% for deal in object_list %}
+  <a href="{% url 'deal_details' deal.pk %}">
+    <div class="card mb-3" style="max-width: 1000px;">
+      <div class="row g-0">
+        <div class="col-md-2">
+          <img src="..." class="img-fluid rounded-start" alt="...">
+        </div>
+        <div class="col-md-9">
+          <div class="card-body">
+            <h5 class="card-title">${{ deal.price }} {{ deal.title }}</h5>
+            <p class="card-text">{{ deal.summary }}</p>
+            <p class="card-text"><small class="text-muted">{{ deal.total_likes }} Likes</small></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </a>
+{% endfor %}
 
 {% for deal in object_list %}
     <li><a href="{% url 'deal_details' deal.pk %}">{{ deal.title }} ${{ deal.price }}</a></li>
@@ -65,5 +159,29 @@
 {% endfor %}
 </ul>
 
+<script>
+  $('.like-form').submit(function (e) {
+    e.preventDefault()
+    const url = $(this).attr('action')
+    var pk = $(this).attr('value');
+    $.ajax({
+      type: 'POST',
+      url: url,
+      data: {
+        pk: 'pk',
+        postid: $('.like-button').val(),
+        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+        action: 'post'
+      },
+      success: function (json) {
+        document.getElementById("like_count").innerHTML = json['result'];
+        $('i').toggleClass('far fas');
+  //    $("#like-button").find('.fa-heart').css("color", "red");
+      },
+      error: function (xhr, errmsg, err) {
 
+      }
+    });
+  })
+</script>
 {% endblock %}

@@ -25,13 +25,11 @@
         </a>
           <div class="card-footer">
             <small class="text-muted">{{ deal.total_likes }} Likes</small>
-            <form action = "{% url 'like_deal' deal.id %}" method="POST" class= 'like-form' id='{{deal.id}}'>
               {% csrf_token %}
-              <input type="hidden" name="postid" value={{deal.id}}>
-                  <span class="" id="like_count">{{deal.like_count}}</span>
-                <button type="submit" class="like-button" value={{deal.id}}>
+              <br/>
+                <button type="post" class="like-button" value={{deal.id}} action = "{% url 'like_deal' deal.id %}" >
                   {% if user.is_authenticated %}
-                    {% if liked %}
+                    {% if request.user in deal.likes.all %}
                       <i class="fas fa-heart" style="background-color: white; font-size: 1.5em; margin-left: 5px;"></i>
                     {% else %}
                       <i class="far fa-heart" style="background-color: white; font-size: 1.5em; margin-left: 5px;"></i>
@@ -40,7 +38,6 @@
                   {% endif %}
 
                 </button>
-            </form>
 <!--
             <div class="d-flex">
               {% if user.is_authenticated %}
@@ -160,28 +157,36 @@
 </ul>
 
 <script>
-  $('.like-form').submit(function (e) {
+  $(document).on('click', ".like-button", function (e) {
     e.preventDefault()
-    const url = $(this).attr('action')
+    const url = $(this).attr('action');
     var pk = $(this).attr('value');
+    const post_id = $(this).attr('value');
+    var clickedBtn = $(this);
+    var nodes = document.getElementsByClassName("like_count");
+    var selector = $(this).find("like_count")
+
     $.ajax({
       type: 'POST',
       url: url,
       data: {
-        pk: 'pk',
-        postid: $('.like-button').val(),
+        pk: pk,
+        postid: post_id,
         csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
         action: 'post'
       },
       success: function (json) {
-        document.getElementById("like_count").innerHTML = json['result'];
-        $('i').toggleClass('far fas');
+        $(clickedBtn).find('.fa-heart').toggleClass('fas far');
+        for (var i = 0; i < nodes.length; i++)
+          nodes[i].innerHTML = json['result'];
   //    $("#like-button").find('.fa-heart').css("color", "red");
+      //  document.getElementById("like_count").innerHTML = json['result'];
       },
       error: function (xhr, errmsg, err) {
 
       }
     });
   })
+
 </script>
 {% endblock %}

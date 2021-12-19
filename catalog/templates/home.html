@@ -27,7 +27,7 @@
             <small class="text-muted">{{ deal.total_likes }} Likes</small>
               {% csrf_token %}
               <br/>
-                <button type="post" class="like-button" value={{deal.id}} action = "{% url 'like_deal' deal.id %}" >
+                <button type="post" class="btn btn-link text-dark p-0 border-0 btn-outline-link shadow-none like-button" value={{deal.id}} action = "{% url 'like_deal' deal.id %}" >
                   {% if user.is_authenticated %}
                     {% if request.user in deal.likes.all %}
                       <i class="fas fa-heart" style="background-color: white; font-size: 1.5em; margin-left: 5px;"></i>
@@ -35,6 +35,9 @@
                       <i class="far fa-heart" style="background-color: white; font-size: 1.5em; margin-left: 5px;"></i>
                     {% endif %}
                   {% else %}
+                    <a href="{% url 'login' %}"
+                      <svg class="far fa-heart" style="background-color: white; font-size: 1.5em; margin-left: 5px;"></svg>
+                    </a>
                   {% endif %}
 
                 </button>
@@ -70,38 +73,11 @@
           </div>
         </div>
     </div>
-  </div>
   {% endfor %}
-
 </div>
 <br/>
 <br/>
 
-<div class="row row-cols-1 row-cols-md-4 g-4">
-    {% for deal in object_list|slice:":8" %}
-      <div class="col">
-        <div class="card mb-3" style="max-width: 540px;">
-          <div class="row g-0">
-            <div class="col-md-4">
-              <a href="{% url 'deal_details' deal.pk %}">
-                {% if deal.header_image %}
-                  <img src="{{ deal.header_image.url }}" width="150" height="150" class="img-fluid rounded-start" alt="...">
-                {% else %}
-                  <img src="{% static 'catalog/images/default_profile.png' %}" width="100" height="100" maxclass="img-fluid rounded-start">
-                {% endif %}
-              </a>
-            </div>
-            <div class="col-md-8">
-              <div class="card-body">
-                <h5 class="card-title">{{ deal.title|slice:":25" }}<br/><strong>${{ deal.price }}</strong></h5>
-                <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-</div>
 
 <br/>
 <div class="row row-cols-1 row-cols-md-6 g-4">
@@ -156,37 +132,40 @@
 {% endfor %}
 </ul>
 
-<script>
-  $(document).on('click', ".like-button", function (e) {
-    e.preventDefault()
-    const url = $(this).attr('action');
-    var pk = $(this).attr('value');
-    const post_id = $(this).attr('value');
-    var clickedBtn = $(this);
-    var nodes = document.getElementsByClassName("like_count");
-    var selector = $(this).find("like_count")
+{% if user.is_authenticated %}
+  <script>
+    $(document).on('click', ".like-button", function (e) {
+      e.preventDefault()
+      const url = $(this).attr('action');
+      var pk = $(this).attr('value');
+      const post_id = $(this).attr('value');
+      var clickedBtn = $(this);
+      var nodes = document.getElementsByClassName("like_count");
+      var selector = $(this).find("like_count")
 
-    $.ajax({
-      type: 'POST',
-      url: url,
-      data: {
-        pk: pk,
-        postid: post_id,
-        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-        action: 'post'
-      },
-      success: function (json) {
-        $(clickedBtn).find('.fa-heart').toggleClass('fas far');
-        for (var i = 0; i < nodes.length; i++)
-          nodes[i].innerHTML = json['result'];
-  //    $("#like-button").find('.fa-heart').css("color", "red");
-      //  document.getElementById("like_count").innerHTML = json['result'];
-      },
-      error: function (xhr, errmsg, err) {
+      $.ajax({
+        type: 'POST',
+        url: url,
+        data: {
+          pk: pk,
+          postid: post_id,
+          csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+          action: 'post'
+        },
+        success: function (json) {
+          $(clickedBtn).find('.fa-heart').toggleClass('fas far');
+          for (var i = 0; i < nodes.length; i++)
+            nodes[i].innerHTML = json['result'];
+    //    $("#like-button").find('.fa-heart').css("color", "red");
+        //  document.getElementById("like_count").innerHTML = json['result'];
+        },
+        error: function (xhr, errmsg, err) {
 
-      }
-    });
-  })
+        }
+      });
+    })
 
-</script>
+  </script>
+{% else %}
+{% endif %}
 {% endblock %}

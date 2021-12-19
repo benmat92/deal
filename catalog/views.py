@@ -4,7 +4,18 @@ from .models import Deal, Category, Comment
 import datetime
 from .forms import DealForm, EditForm, CommentForm
 from django.urls import reverse_lazy, reverse
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
+from rest_framework import status
+from .serializers import DealSerializer, CategorySerializer
+from rest_framework import generics, permissions, renderers, viewsets
+from accounts.models import CustomUser
+from .permissions import IsOwnerOrReadOnly
+from rest_framework.decorators import api_view, action
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.parsers import JSONParser
 
 # Create your views here.
 
@@ -153,3 +164,88 @@ class DeleteDealView(DeleteView):
         context = super(DeleteDealView, self).get_context_data(*args, **kwargs)
         context["cat_menu"] = cat_menu
         return context
+"""
+class DealViews(APIView):
+
+    def get(self, request, format=None):
+        deals = Deal.objects.all()
+        serializer = DealSerializer(deals, many=True)
+        return Response(serializer.data)
+    def post(self, request):
+        serializer = DealSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+        else:
+            return Response({"status": "error", "data": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+class DealDetailViews(APIView):
+    def get_object(self, pk):
+        try:
+            return Deal.objects.get(pk=pk)
+        except Deal.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        deal = self.get_object(pk)
+        serializer = DealSerializer(deal)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        deal = self.get_object(pk)
+        serializer = DealSerializer(deal, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        deal = self.get_object(pk)
+        deal.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+"""
+
+
+
+"""
+class DealViews(generics.ListCreateAPIView):
+    queryset = Deal.objects.all()
+    serializer_class = DealSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+
+class DealDetailViews(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Deal.objects.all()
+    serializer_class = DealSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+class DealHighlight(generics.GenericAPIView):
+    queryset = Deal.objects.all()
+    renderer_classes = [renderers.StaticHTMLRenderer]
+
+    def get(self, request, *args, **kwargs):
+        deal = self.get_object()
+        return Response(deal.highlighted)
+"""
+class DealViewSet(viewsets.ModelViewSet):
+    """
+    This viewset automatically provides `list`, `create`, `retrieve`,
+    `update` and `destroy` actions.
+
+    Additionally we also provide an extra `highlight` action.
+    """
+    queryset = Deal.objects.all()
+    serializer_class = DealSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly]
+
+    @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
+    def highlight(self, request, *args, **kwargs):
+        snippet = self.get_object()
+        return Response(snippet.highlighted)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+class CategoryViewSet(viewsets.ModelViewSet):
+
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer

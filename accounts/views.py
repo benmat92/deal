@@ -6,6 +6,10 @@ from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordChangeView, LoginView
 from django.contrib.auth.forms import PasswordChangeForm
 from catalog.models import Profile, Category
+from accounts.models import CustomUser
+from rest_framework import generics, viewsets
+from accounts.serializers import UserSerializer
+
 #email activation
 
 
@@ -80,3 +84,24 @@ class LoginView(LoginView):
         context = super(LoginView, self).get_context_data(*args, **kwargs)
         context["cat_menu"] = cat_menu
         return context
+
+
+"""
+class UserList(generics.ListAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+"""
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    This viewset automatically provides `list` and `retrieve` actions.
+    """
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from .models import Deal, Category, Comment
 import datetime
 from .forms import DealForm, EditForm, CommentForm
@@ -16,7 +16,7 @@ from .permissions import IsOwnerOrReadOnly
 from rest_framework.decorators import api_view, action
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
-
+from rest_framework.permissions import IsAdminUser, BasePermission, SAFE_METHODS
 # Create your views here.
 
 """
@@ -132,6 +132,8 @@ class AddDealView(CreateView):
     model = Deal
     form_class = DealForm
     template_name = 'add_deal.html'
+    template_name = 'test.html'
+
 
     #fields = '__all__'
     #fields = ('title', 'store', 'brand', 'price', 'summary', 'url', 'category')
@@ -225,6 +227,16 @@ class DealHighlight(generics.GenericAPIView):
         deal = self.get_object()
         return Response(deal.highlighted)
 """
+
+class DealUserWritePermission(BasePermission):
+    message = 'Editing deals is restricted to the author only'
+    def has_object_permission(self, request, view, obj):
+
+        if request.method in SAFE_METHODS:
+            return True
+
+        return obj.author == request.user
+
 class DealViewSet(viewsets.ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
@@ -234,8 +246,7 @@ class DealViewSet(viewsets.ModelViewSet):
     """
     queryset = Deal.objects.all()
     serializer_class = DealSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
-                          IsOwnerOrReadOnly]
+    permission_classes = [IsOwnerOrReadOnly]
 
     @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
     def highlight(self, request, *args, **kwargs):
@@ -245,7 +256,18 @@ class DealViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+class DealDetail(generics.RetrieveUpdateDestroyAPIView, DealUserWritePermission):
+    permission_classes = [DealUserWritePermission]
+    queryset = Deal.objects.all()
+    serializer_class = DealSerializer
+
 class CategoryViewSet(viewsets.ModelViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+class MyReactView(TemplateView):
+    template_name = 'react_app.html'
+
+    def get_context_data(self, **kwargs):
+        return {'context_variable': 'value'}

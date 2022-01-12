@@ -22,6 +22,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
+from rest_framework.documentation import include_docs_urls
 
 
 
@@ -36,4 +37,5 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('accounts/', include('allauth.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('docs/', include_docs_urls(title='My API service'), name='api-docs'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -10,7 +10,7 @@ media
 *.bak
 
 # If you are using PyCharm #
-.idea/**/workspace.xml 
+.idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/dictionaries
 .idea/**/dataSources/
@@ -27,6 +27,9 @@ media
 # Python #
 *.py[cod]
 *$py.class
+
+#node modules check
+node_modules
 
 # Distribution / packaging
 .Python build/

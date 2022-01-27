@@ -13,7 +13,7 @@ admin.site.register(Category, CategoryAdmin)
 
 class DealAdmin(admin.ModelAdmin):
     list_filter = ('status', 'date_posted')
-
+    prepopulated_fields = {'slug': ('title',), }
 admin.site.register(Deal, DealAdmin)
 
 

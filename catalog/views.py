@@ -244,9 +244,10 @@ class DealViewSet(viewsets.ModelViewSet):
 
     Additionally we also provide an extra `highlight` action.
     """
-    queryset = Deal.objects.all()
+#    queryset = Deal.objects.all()
     serializer_class = DealSerializer
     permission_classes = [IsOwnerOrReadOnly]
+    category = CategorySerializer(many=True, read_only=True)
 
     @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
     def highlight(self, request, *args, **kwargs):
@@ -255,6 +256,14 @@ class DealViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    def get_object(self, queryset=None, **kwargs):
+        item = self.kwargs.get('pk')
+        return get_object_or_404(Deal, id=item)
+
+    # Define Custom Queryset
+    def get_queryset(self):
+        return Deal.objects.all()
 
 class DealDetail(generics.RetrieveUpdateDestroyAPIView, DealUserWritePermission):
     permission_classes = [DealUserWritePermission]
@@ -265,6 +274,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    view_name='catalog:category-detail'
 
 class MyReactView(TemplateView):
     template_name = 'react_app.html'

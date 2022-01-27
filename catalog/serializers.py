@@ -3,11 +3,14 @@ from .models import Deal, Category
 import uuid
 from ckeditor.fields import RichTextField
 from accounts.models import CustomUser
+from newhomewhothis import settings
 
 
 class DealSerializer(serializers.HyperlinkedModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
-    highlight = serializers.HyperlinkedIdentityField(view_name='deal-highlight', format='html')
+    id = serializers.UUIDField(default=uuid.uuid4)
+
+#    highlight = serializers.HyperlinkedIdentityField(view_name='deal-highlight', format='html')
 
     class Meta:
         model = Deal
@@ -15,11 +18,21 @@ class DealSerializer(serializers.HyperlinkedModelSerializer):
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Deal
+        model = Category
         fields='__all__'
 
 
 
+class UserRegisterSerializer(serializers.ModelSerializer):
+
+    email = serializers.EmailField(required=True)
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(min_length=8, write_only=True)
+
+    class Meta:
+        model = settings.AUTH_USER_MODEL
+        fields = ('email', 'username')
+        extra_kwargs = {'password': {'write_only': True}}
     """Model representing a deal"""
 """
     id = serializers.UUIDField(primary_key=True, default=uuid.uuid4)

@@ -7,9 +7,12 @@ from django.contrib.auth.views import PasswordChangeView, LoginView
 from django.contrib.auth.forms import PasswordChangeForm
 from catalog.models import Profile, Category
 from accounts.models import CustomUser
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, status
 from accounts.serializers import UserSerializer
-
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.response import Response
+from rest_framework.views import APIView
 #email activation
 
 
@@ -105,3 +108,29 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserSerializer
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+
+class CustomUserCreate(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, format='json'):
+        serializer = UserSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            user = serializer.save()
+            if user:
+                json = serializer.data
+                return Response(json, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class BlacklistTokenUpdateView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = ()
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)

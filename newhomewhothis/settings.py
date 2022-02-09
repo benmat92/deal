@@ -42,13 +42,13 @@ INSTALLED_APPS = [
     'catalog.apps.CatalogConfig',
     'accounts.apps.AccountsConfig',
     'rest_framework',
-    'rest_framework.authtoken',
-    'rest_auth',
-    'rest_auth.registration',
-    'ckeditor',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
+    #'rest_framework.authtoken',
+    #'rest_auth',
+    #'rest_auth.registration',
+    #'ckeditor',
+    #'allauth',
+    #'allauth.account',
+    #'allauth.socialaccount',
     'fontawesomefree',
     'webpack_loader',
     'corsheaders',
@@ -156,11 +156,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.CustomUser' # new
 
-AUTHENTICATION_BACKENDS = [
-    'accounts.backends.EmailBackend',
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
-    ]
+#AUTHENTICATION_BACKENDS = [
+#    'accounts.backends.EmailBackend',
+#    'django.contrib.auth.backends.ModelBackend',
+#    'allauth.account.auth_backends.AuthenticationBackend',
+#    ]
 
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.UserSerializer',
@@ -168,6 +168,7 @@ REST_AUTH_SERIALIZERS = {
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
+    'http://127.0.0.1:8000/',
 ]
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
@@ -199,10 +200,13 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',],
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+        'rest_framework.permissions.AllowAny',
+        ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication'
+    ],
+    'DEFAULT_SCHEMA_CLASS': ['rest_framework.schemas.coreapi.AutoSchema'],
     # 'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
@@ -215,7 +219,6 @@ WEBPACK_LOADER = {
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:3000",
     "http://localhost:3000",
 ]
 """
@@ -239,5 +242,6 @@ SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'TOKEN_TYPE_CLAIM': 'token_type',
 }
+
 
 REST_FRAMEWORK = { 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema' }

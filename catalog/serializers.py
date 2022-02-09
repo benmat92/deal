@@ -7,7 +7,6 @@ from newhomewhothis import settings
 
 
 class DealSerializer(serializers.HyperlinkedModelSerializer):
-    author = serializers.ReadOnlyField(source='author.username')
     id = serializers.UUIDField(default=uuid.uuid4)
 
 #    highlight = serializers.HyperlinkedIdentityField(view_name='deal-highlight', format='html')

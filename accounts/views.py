@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from django.views.generic import DetailView
-from .forms import CustomUserCreationForm, CustomUserChangeForm, EditProfileForm, LoginForm
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordChangeView, LoginView
 from django.contrib.auth.forms import PasswordChangeForm
@@ -19,7 +18,7 @@ from rest_framework.views import APIView
 
 
 # Create your views here.
-
+'''
 class EditProfilePageView(generic.UpdateView):
     model = Profile
     form_class = EditProfileForm
@@ -87,7 +86,7 @@ class LoginView(LoginView):
         context = super(LoginView, self).get_context_data(*args, **kwargs)
         context["cat_menu"] = cat_menu
         return context
-
+'''
 
 """
 class UserList(generics.ListAPIView):

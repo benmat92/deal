@@ -17,6 +17,13 @@ from rest_framework.decorators import api_view, action
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAdminUser, BasePermission, SAFE_METHODS
+from rest_framework import filters
+from rest_framework.decorators import api_view
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+
+
 # Create your views here.
 
 """
@@ -246,7 +253,8 @@ class DealViewSet(viewsets.ModelViewSet):
     """
 #    queryset = Deal.objects.all()
     serializer_class = DealSerializer
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [permissions.AllowAny]
+
     category = CategorySerializer(many=True, read_only=True)
 
     @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
@@ -267,8 +275,21 @@ class DealViewSet(viewsets.ModelViewSet):
 
 class DealDetail(generics.RetrieveUpdateDestroyAPIView, DealUserWritePermission):
     permission_classes = [DealUserWritePermission]
+#    queryset = Deal.objects.all()
+    serializer_class = DealSerializer
+
+    def get_queryset(self):
+        slug = self.request.get('slug', None)
+        print(slug)
+        return Deal.objects.filter(slug=slug)
+
+class DealListDetailFilter(generics.ListAPIView):
+
     queryset = Deal.objects.all()
     serializer_class = DealSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['^slug']
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
 
@@ -281,3 +302,25 @@ class MyReactView(TemplateView):
 
     def get_context_data(self, **kwargs):
         return {'context_variable': 'value'}
+
+
+class CreateDeal(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Deal.objects.all()
+    serializer_class = DealSerializer
+
+class AdminDealDetail(generics.RetrieveAPIView):
+    permission_classes = [permissions.AllowAny]
+    queryset = Deal.objects.all()
+    serializer_class = DealSerializer
+
+class EditDeal(generics.UpdateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = DealSerializer
+    queryset = Deal.objects.all()
+
+class DeleteDeal(generics.RetrieveDestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = DealSerializer
+    queryset = Deal.objects.all()

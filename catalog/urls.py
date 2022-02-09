@@ -1,5 +1,6 @@
 from django.urls import path, include
-from .views import HomeView, DealDetailView, AddDealView, UpdateDealView, DeleteDealView, CategoryView, like, CommentView, DealViewSet, CategoryViewSet, TemplateView, MyReactView, DealDetail
+from .views import HomeView, DealDetailView, AddDealView, UpdateDealView, DeleteDealView, CategoryView
+from .views import like, CommentView, DealViewSet, CategoryViewSet, TemplateView, MyReactView, DealDetail, Deal, CreateDeal, AdminDealDetail, EditDeal, DeleteDeal
 from accounts.views import BlacklistTokenUpdateView
 from django.views.generic import TemplateView
 from rest_framework.urlpatterns import format_suffix_patterns
@@ -18,7 +19,7 @@ category_detail = CategoryViewSet.as_view({
 #urlpatterns = router.urls
 
 urlpatterns = [
-    #path('', HomeView.as_view(), name="home"),
+     path('index/', HomeView.as_view(), name="home"),
 #    path('deal/<uuid:pk>/', DealDetailView.as_view(), name="deal_details"),
 #    path('add_deal/', AddDealView.as_view(), name = 'add_deal'),
 #    path('deal/edit/<uuid:pk>/', UpdateDealView.as_view(), name = 'update_deal'),
@@ -28,7 +29,9 @@ urlpatterns = [
 #    path('add_comment/<uuid:pk>/', CommentView.as_view(), name = 'add_comment'),
     path('', include(router.urls)),
     path('category/<int:pk>/', category_detail, name='category-detail'),
-
+#    path('admin/edit/dealdetail/<int:pk>/', AdminDealDetail.as_view(), name='admindetaildeal'),
+#    path('admin/edit/<int:pk>/', EditDeal.as_view(), name='editdeal'),
+#    path('admin/delete/<int:pk>/', DeleteDeal.as_view(), name='deletedeal'),
 #    path('test/', AddDealView.as_view(), name = 'test'),
     # this route catches the "naked" URL with no path specified. you can link to it in most places
 #    path(r'my-react-page/', MyReactView.as_view(), name='react_app'),

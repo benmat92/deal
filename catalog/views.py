@@ -319,8 +319,10 @@ class EditDeal(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = DealSerializer
     queryset = Deal.objects.all()
+    authentication_classes = [JWTAuthentication]
 
 class DeleteDeal(generics.RetrieveDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
     serializer_class = DealSerializer
     queryset = Deal.objects.all()

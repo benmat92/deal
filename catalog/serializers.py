@@ -8,6 +8,7 @@ from newhomewhothis import settings
 
 class DealSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.UUIDField(default=uuid.uuid4)
+    date_posted = serializers.DateTimeField()
 
 #    highlight = serializers.HyperlinkedIdentityField(view_name='deal-highlight', format='html')
 

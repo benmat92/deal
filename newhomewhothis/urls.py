@@ -37,10 +37,11 @@ urlpatterns = [
     # Post Admin URLs
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('admin/create/', CreateDeal.as_view(), name='createdeal'),
-    path('admin/edit/dealdetail/<uuid:pk>/', AdminDealDetail.as_view(), name='admindetaildeal'),
-    path('admin/edit/<int:pk>/', EditDeal.as_view(), name='editdeal'),
-    path('admin/delete/<int:pk>/', DeleteDeal.as_view(), name='deletedeal'),
+    path('admin/', admin.site.urls),
+    path('apiadmin/create/', CreateDeal.as_view(), name='createdeal'),
+    path('apiadmin/edit/dealdetail/<uuid:pk>/', AdminDealDetail.as_view(), name='admindetaildeal'),
+    path('apiadmin/edit/<uuid:pk>/', EditDeal.as_view(), name='editdeal'),
+    path('apiadmin/delete/<uuid:pk>/', DeleteDeal.as_view(), name='deletedeal'),
 #    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
 #    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('schema/', get_schema_view(
@@ -59,7 +60,6 @@ urlpatterns = [
 #    path('accounts/', include('allauth.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('logout/blacklist/', BlacklistTokenUpdateView.as_view(), name='blacklist'),
-    path('admin/', admin.site.urls),
 
 
 

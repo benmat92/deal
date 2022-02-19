@@ -1,18 +1,24 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from django.views.generic import DetailView
-from .forms import CustomUserCreationForm, CustomUserChangeForm, EditProfileForm, LoginForm
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordChangeView, LoginView
 from django.contrib.auth.forms import PasswordChangeForm
 from catalog.models import Profile, Category
+from accounts.models import CustomUser
+from rest_framework import generics, viewsets, status
+from accounts.serializers import UserSerializer
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.response import Response
+from rest_framework.views import APIView
 #email activation
 
 
 
 
 # Create your views here.
-
+'''
 class EditProfilePageView(generic.UpdateView):
     model = Profile
     form_class = EditProfileForm
@@ -80,3 +86,50 @@ class LoginView(LoginView):
         context = super(LoginView, self).get_context_data(*args, **kwargs)
         context["cat_menu"] = cat_menu
         return context
+'''
+
+"""
+class UserList(generics.ListAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+"""
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    This viewset automatically provides `list` and `retrieve` actions.
+    """
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class CustomUserCreate(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, format='json'):
+        serializer = UserSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            user = serializer.save()
+            if user:
+                json = serializer.data
+                return Response(json, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class BlacklistTokenUpdateView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = ()
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)

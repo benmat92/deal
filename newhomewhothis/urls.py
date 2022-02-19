@@ -14,17 +14,53 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+#from allauth.account.views import confirm_email
 from django.urls import path
 from django.urls import include
+from django.conf.urls import url
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth.models import User
+from rest_framework import routers, serializers, viewsets
+from rest_framework.documentation import include_docs_urls
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from accounts.views import BlacklistTokenUpdateView
+from catalog.views import DealListDetailFilter, CreateDeal, AdminDealDetail, EditDeal, DeleteDeal
+from rest_framework.schemas import get_schema_view
+from django.views.decorators.csrf import csrf_exempt
+
+
 
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # Post Admin URLs
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('admin/create/', CreateDeal.as_view(), name='createdeal'),
+    path('admin/edit/dealdetail/<uuid:pk>/', AdminDealDetail.as_view(), name='admindetaildeal'),
+    path('admin/edit/<int:pk>/', EditDeal.as_view(), name='editdeal'),
+    path('admin/delete/<int:pk>/', DeleteDeal.as_view(), name='deletedeal'),
+#    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+#    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('schema/', get_schema_view(
+        title="Deals API",
+        description="API for the Deals",
+        version="1.0.0"
+    ), name='openapi-schema'),
+    path('docs/', include_docs_urls(title='My API service'), name='api-docs'),
+    path('search/', DealListDetailFilter.as_view(), name='dealsearch'),
     path('', include('catalog.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),
+#    url(r'^rest-auth/', include('rest_auth.urls')),
+#    url(r'^rest-auth/registration/', include('rest_auth.registration.urls')),
+#    url(r'^accounts-rest/registration/account-confirm-email/(?P<key>.+)/$', confirm_email, name='account_confirm_email'),
+#    path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('accounts.urls')),
-    path('accounts/', include('allauth.urls')),
+#    path('accounts/', include('allauth.urls')),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('logout/blacklist/', BlacklistTokenUpdateView.as_view(), name='blacklist'),
+    path('admin/', admin.site.urls),
+
+
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

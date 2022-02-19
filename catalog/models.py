@@ -48,9 +48,10 @@ class Deal(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title_tag = models.CharField(max_length=200, default="Shared Hallway")
     store = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=250, unique_for_date='date_posted')
     brand = models.CharField(max_length=200)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    date_posted = models.DateField(auto_now_add=True)
+    date_posted = models.DateTimeField(auto_now_add=True)
     # Foreign Key used because book can only have one author, but authors can have multiple books
     # Author as a string rather than object because it hasn't been declared yet in the file
     #store = models.ForeignKey('Store', on_delete=models.SET_NULL, null=True)
@@ -78,6 +79,9 @@ class Deal(models.Model):
         default='a',
         help_text='Deal availability',
     )
+
+    class Meta:
+        ordering = ['date_posted']
 
     def total_likes(self):
         return self.likes.count()

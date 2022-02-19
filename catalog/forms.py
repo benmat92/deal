@@ -27,7 +27,7 @@ class DealForm(forms.ModelForm):
 class EditForm(forms.ModelForm):
     class Meta:
         model = Deal
-        fields = ('title', 'store', 'brand', 'price', 'summary', 'url', 'category')
+        fields = ('title', 'store', 'brand', 'price', 'summary', 'url', 'category', 'header_image')
 
 
         widgets = {
@@ -38,6 +38,8 @@ class EditForm(forms.ModelForm):
             'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter the final price of the deal'}),
             'summary': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter a brief description of the deal'}),
             'url': forms.TextInput(attrs={'class': 'form-control'}),
+            'header_image': forms.FileInput(attrs={'class': 'form-control'}),
+
 
         }
 

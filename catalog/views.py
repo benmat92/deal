@@ -20,7 +20,9 @@ from rest_framework.permissions import IsAdminUser, BasePermission, SAFE_METHODS
 from rest_framework import filters
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.parsers import MultiPartParser, FormParser
+from oauth2_provider.contrib.rest_framework import OAuth2Authentication
+
 
 
 
@@ -253,6 +255,10 @@ class DealViewSet(viewsets.ModelViewSet):
     """
 #    queryset = Deal.objects.all()
     serializer_class = DealSerializer
+#    permission_classes = [permissions.AllowAny]
+#   authentication_classes = [JWTAuthentication]
+#    authentication_classes = [TokenAuthentication]
+    authentication_classes = [OAuth2Authentication]
     permission_classes = [permissions.AllowAny]
 
     category = CategorySerializer(many=True, read_only=True)
@@ -304,11 +310,26 @@ class MyReactView(TemplateView):
         return {'context_variable': 'value'}
 
 
-class CreateDeal(generics.CreateAPIView):
+# class CreateDeal(generics.CreateAPIView):
+#     permission_classes = [permissions.IsAuthenticated]
+#     authentication_classes = [JWTAuthentication]
+#     queryset = Deal.objects.all()
+#     serializer_class = DealSerializer
+
+class CreateDeal(APIView):
+    authentication_classes = [OAuth2Authentication]
     permission_classes = [permissions.IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
-    queryset = Deal.objects.all()
-    serializer_class = DealSerializer
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, format=None):
+        print(request.data)
+        serializer = DealSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class AdminDealDetail(generics.RetrieveAPIView):
     permission_classes = [permissions.AllowAny]
@@ -319,10 +340,8 @@ class EditDeal(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = DealSerializer
     queryset = Deal.objects.all()
-    authentication_classes = [JWTAuthentication]
 
 class DeleteDeal(generics.RetrieveDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
     serializer_class = DealSerializer
     queryset = Deal.objects.all()

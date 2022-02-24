@@ -31,7 +31,7 @@ class CustomAccountManager(BaseUserManager):
         user.set_password(password)
         user.save()
         return user
-
+    
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(gettext_lazy('email address'), unique=True)
     username = models.CharField(max_length=150, unique=True)

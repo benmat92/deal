@@ -5,7 +5,10 @@ import uuid
 from datetime import datetime, date
 from newhomewhothis import settings
 from ckeditor.fields import RichTextField
+from django.utils.translation import gettext_lazy
 
+def upload_to(instance, filename):
+    return 'deals/{filename}'.format(filename=filename)
 
 # Create your models here.
 class Category(models.Model):
@@ -29,7 +32,7 @@ class Category(models.Model):
         return self.name
 
 class Profile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     bio = models.TextField(max_length=1000, blank=True)
     profile_pic = models.ImageField(null=True, blank=True, upload_to="images/profile/")
     website_url = models.CharField(max_length=200, null=True, blank=True)
@@ -44,11 +47,11 @@ class Deal(models.Model):
     """Model representing a deal"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     title = models.CharField(max_length=25)
-    header_image = models.ImageField(null=True, blank=True, upload_to="images/")
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    header_image = models.ImageField(gettext_lazy("Image"), default='/images/Walmart_ereceipt.PNG', blank=True, upload_to=upload_to)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default='benji')
     title_tag = models.CharField(max_length=200, default="Shared Hallway")
     store = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=250)
+    slug = models.SlugField(max_length=250, null=True)
     brand = models.CharField(max_length=200)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     date_posted = models.DateTimeField(auto_now_add=True)

@@ -1,7 +1,6 @@
 from django.urls import path, include
 from .views import HomeView, DealDetailView, AddDealView, UpdateDealView, DeleteDealView, CategoryView
 from .views import like, CommentView, DealViewSet, CategoryViewSet, TemplateView, MyReactView, DealDetail, Deal, CreateDeal, AdminDealDetail, EditDeal, DeleteDeal
-from accounts.views import BlacklistTokenUpdateView
 from django.views.generic import TemplateView
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework.routers import DefaultRouter
@@ -25,7 +24,6 @@ urlpatterns = [
 #    path('deal/edit/<uuid:pk>/', UpdateDealView.as_view(), name = 'update_deal'),
 #    path('deal/<uuid:pk>/remove/', DeleteDealView.as_view(), name = 'delete_deal'),
 #    path('category/<str:cats>/', CategoryView, name = 'category'),
-#    path('like/<uuid:pk>/', like, name = 'like_deal'),
 #    path('add_comment/<uuid:pk>/', CommentView.as_view(), name = 'add_comment'),
     path('', include(router.urls)),
     path('category/<int:pk>/', category_detail, name='category-detail'),

@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,18 +42,16 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'catalog.apps.CatalogConfig',
     'accounts.apps.AccountsConfig',
-    'rest_framework',
-    #'rest_framework.authtoken',
     #'rest_auth',
     #'rest_auth.registration',
-    #'ckeditor',
-    #'allauth',
-    #'allauth.account',
-    #'allauth.socialaccount',
+    'sslserver',
+    'ckeditor',
     'fontawesomefree',
     'webpack_loader',
     'corsheaders',
-    'rest_framework_simplejwt.token_blacklist',
+    'oauth2_provider',
+    'social_django',
+    'drf_social_oauth2',
 
 ]
 
@@ -82,6 +81,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -156,11 +157,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.CustomUser' # new
 
-#AUTHENTICATION_BACKENDS = [
+AUTHENTICATION_BACKENDS = [
+    'drf_social_oauth2.backends.DjangoOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
 #    'accounts.backends.EmailBackend',
 #    'django.contrib.auth.backends.ModelBackend',
 #    'allauth.account.auth_backends.AuthenticationBackend',
-#    ]
+    ]
 
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.UserSerializer',
@@ -169,6 +172,8 @@ REST_AUTH_SERIALIZERS = {
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'http://127.0.0.1:8000/',
+#    'https://localhost:3000/',
+#    'https://127.0.0.1:8000/',
 ]
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
@@ -204,7 +209,9 @@ REST_FRAMEWORK = {
         ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication'
+#        'rest_framework.authentication.TokenAuthentication',
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'drf_social_oauth2.authentication.SocialAuthentication',
     ],
     'DEFAULT_SCHEMA_CLASS': ['rest_framework.schemas.coreapi.AutoSchema'],
     # 'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
@@ -219,7 +226,8 @@ WEBPACK_LOADER = {
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "http://localhost:3000"
+#    "https://localhost:3000",
 ]
 """
 REST_FRAMEWORK = {
@@ -228,20 +236,6 @@ REST_FRAMEWORK = {
     )
 }
 """
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=10),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,
-    'VERIFYING_KEY': None,
-    'AUTH_HEADER_TYPES': ('JWT',),
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-    'TOKEN_TYPE_CLAIM': 'token_type',
-}
-
+CORS_ALLOW_CREDENTIALS = True
 
 REST_FRAMEWORK = { 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema' }

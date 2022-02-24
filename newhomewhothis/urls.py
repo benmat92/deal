@@ -23,9 +23,7 @@ from django.conf.urls.static import static
 from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
 from rest_framework.documentation import include_docs_urls
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from accounts.views import BlacklistTokenUpdateView
-from catalog.views import DealListDetailFilter, CreateDeal, AdminDealDetail, EditDeal, DeleteDeal
+from catalog.views import DealListDetailFilter, CreateDeal, AdminDealDetail, EditDeal, DeleteDeal, like
 from rest_framework.schemas import get_schema_view
 from django.views.decorators.csrf import csrf_exempt
 
@@ -34,10 +32,11 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 urlpatterns = [
+    #oauth
+    url('auth/', include('drf_social_oauth2.urls', namespace='drf')),
     # Post Admin URLs
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('admin/', admin.site.urls),
+    path('api/like/<uuid:pk>/', like, name = 'like_deal'),
     path('apiadmin/create/', CreateDeal.as_view(), name='createdeal'),
     path('apiadmin/edit/dealdetail/<uuid:pk>/', AdminDealDetail.as_view(), name='admindetaildeal'),
     path('apiadmin/edit/<uuid:pk>/', EditDeal.as_view(), name='editdeal'),
@@ -59,7 +58,6 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
 #    path('accounts/', include('allauth.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('logout/blacklist/', BlacklistTokenUpdateView.as_view(), name='blacklist'),
 
 
 

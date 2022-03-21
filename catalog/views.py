@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from .models import Deal, Category, Comment
+from accounts.serializers import UserSerializer
+from accounts.models import CustomUser
 import datetime
 from .forms import DealForm, EditForm, CommentForm
 from django.urls import reverse_lazy, reverse
@@ -22,6 +24,10 @@ from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import MultiPartParser, FormParser
 from oauth2_provider.contrib.rest_framework import OAuth2Authentication
+from rest_framework.decorators import api_view
+from oauth2_provider.models import Application, AccessToken
+
+
 
 
 
@@ -40,29 +46,38 @@ def LikeView(request, pk):
         liked = True
     return HttpResponseRedirect(reverse('deal_details', args=[str(pk)]))
 """
-
+@api_view(['POST'])
 def like(request, pk):
+    authentication_classes = [OAuth2Authentication]
+#    user = get_object_or_404(UserSerializer, email=request.data['user'])
+    permission_classes = [permissions.IsAuthenticated]
     result = ''
-    if request.POST.get('action') =='post':
-        id = request.POST.get('postid')
+#    localStorage.getItem
+    #user = AccessToken.objects.get(token=res.data['access_token'])
+    if request.data['action'] =='post':
+        id = request.data['postid']
+    #    user = request.data['user']
+        user = get_object_or_404(CustomUser, email=request.data['user'])
         deal = get_object_or_404(Deal, id=id)
         liked=False
-        if deal.likes.filter(id=request.user.id).exists():
-            deal.likes.remove(request.user)
+        if deal.likes.filter(username=user).exists():
+            deal.likes.remove(user)
             deal.like_count -= 1
             liked = False
             result = deal.like_count
             deal.save()
         else:
-            deal.likes.add(request.user)
+            deal.likes.add(user)
             deal.like_count += 1
             liked = True
             result = deal.like_count
             deal.save()
-        return JsonResponse({'result': result,})
+#    return JsonResponse({'result': result,})
+        return Response(print(deal.like_count))
     else:
-        return JsonResponse({'result': result,})
-
+        user = get_object_or_404(CustomUser, email=request.data['user'])
+#        return JsonResponse({'result': result,})
+        return Response(print(deal.like_count))
 class CommentView(CreateView):
     model = Comment
     form_class = CommentForm
@@ -256,7 +271,7 @@ class DealViewSet(viewsets.ModelViewSet):
 #    queryset = Deal.objects.all()
     serializer_class = DealSerializer
 #    permission_classes = [permissions.AllowAny]
-#   authentication_classes = [JWTAuthentication]
+#    authentication_classes = [JWTAuthentication]
 #    authentication_classes = [TokenAuthentication]
     authentication_classes = [OAuth2Authentication]
     permission_classes = [permissions.AllowAny]

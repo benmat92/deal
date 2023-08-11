@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import Register from './components/register';
+import Login from './components/login';
+import Logout from './components/logout';
 import App from './App';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
@@ -16,6 +19,9 @@ ReactDOM.render(
         <Header />
         <Routes>
           <Route path="/" element={<App />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/logout" element={<Logout />} />
           {/* You can add more routes here as needed */}
         </Routes>
         <Footer />

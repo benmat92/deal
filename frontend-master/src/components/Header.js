@@ -1,52 +1,46 @@
 import React from 'react';
-import { AppBar, Toolbar, IconButton, Typography, Button, InputBase } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import { makeStyles } from '@mui/styles';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import CssBaseline from '@mui/material/CssBaseline';
+import { styled } from '@mui/material/styles';
+import { NavLink } from 'react-router-dom';
+import Link from '@mui/material/Link';
+import Button from '@mui/material/Button';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
-  title: {
-    flexGrow: 1,
-    display: 'none',
-    [theme.breakpoints.up('sm')]: {
-      display: 'block',
-    },
-  },
-  inputRoot: {
+// For an active link styling with react-router's NavLink
+const StyledNavLink = styled(NavLink)({
+    textDecoration: 'none',
     color: 'inherit',
-  },
-  inputInput: {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '20ch',
+    '&.active': {
+        textDecoration: 'underline',
     },
-  },
-}));
+});
 
-export default function Header() {
-  const classes = useStyles();
-
-  return (
-    <div className={classes.root}>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-            <img src="/logo.png" alt="logo" height="30" />
-          </IconButton>
-          <Typography variant="h6" className={classes.title}>
-            DealFinder
-          </Typography>
-          <Button color="inherit">Login</Button>
-        </Toolbar>
-      </AppBar>
-    </div>
-  );
+function Header() {
+    return (
+        <>
+            <CssBaseline />
+            <AppBar position="static" color="default" elevation={0}>
+                <Toolbar>
+                    <Typography variant="h6" color="inherit" noWrap>
+                        DealHunt
+                    </Typography>
+                    <nav>
+                        <Link variant="button" color="textPrimary" component={StyledNavLink} to="/login" style={{ marginLeft: 15 }}>
+                            Login
+                        </Link>
+                        <Link variant="button" color="textPrimary" component={StyledNavLink} to="/register" style={{ marginLeft: 15 }}>
+                            Register
+                        </Link>
+                    </nav>
+                    <Button color="primary" variant="outlined" style={{ marginLeft: 'auto' }}>
+                        Logout
+                    </Button>
+                </Toolbar>
+            </AppBar>
+        </>
+    );
 }
+
+export default Header;

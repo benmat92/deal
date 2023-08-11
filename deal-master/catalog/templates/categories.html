@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'catalog/style.css' %}">
+
+{% if category_deals %}
+  <h1>{{ cats }}</h1>
+  <ul>
+  {% for deal in category_deals %}
+
+    <li><a href="{% url 'deal_details' deal.pk %}">{{ deal.title }} ${{ deal.price }}</a>
+    {% for category in deal.category.all %}{% endfor %}
+
+    </li>
+
+  {% endfor %}
+  </ul>
+{% else %}
+<h2>Sorry this page does not exist</h2>
+
+{% endif %}
+
+{% endblock %}

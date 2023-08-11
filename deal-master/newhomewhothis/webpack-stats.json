@@ -1,0 +1,14 @@
+{
+  "status": "done",
+  "assets": {
+    "main-06274f47efb6fd67faa2.js": {
+      "name": "main-06274f47efb6fd67faa2.js",
+      "path": "C:\\Users\\Benji\\deal\\newhomewhothis\\static\\catalog\\bundles\\main-06274f47efb6fd67faa2.js"
+    }
+  },
+  "chunks": {
+    "main": [
+      "main-06274f47efb6fd67faa2.js"
+    ]
+  }
+}

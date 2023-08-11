@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Create a New Deal{% endblock %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+  <h1>Post Deal</h1>
+  <br/>
+  <div class="mb-3">
+    <div class="col-md-5">
+      <form method ="POST" enctype="multipart/form-data">
+
+        {% csrf_token %}
+          <label>Title</label>
+        {{ form.title }}
+        <br/>
+        {{ form.author }}
+          <label>Price</label>
+        {{ form.price }}
+        <br/>
+          <label>Store</label>
+        {{ form.store }}
+        <br/>
+          <label>Brand</label>
+        {{ form.brand }}
+        <br/>
+          <label></label>
+        {{ form.summary }}
+        {{ form.media }}
+        <br/>
+          <label>Url</label>
+        {{ form.url }}
+        <br/>
+          <label>Upload Image</label>
+        <br/>
+        {{ form.header_image }}
+        <br/><br/>
+          <label>Category</label>
+        {% for checkbox in form.category %}
+          <div class="checkbox">
+              <label>
+                      {{ checkbox.tag }} {{ checkbox.choice_label }}
+              </label>
+          </div>
+        {% endfor %}
+        <br/>
+        <button class="btn btn-primary" type = "submit">Post</button>
+  </div>
+
+  <script>
+    var name = "{{ user.id }}";
+    document.getElementById("benji").value
+      = name;
+  </script>
+
+{% else %}
+
+Gotta login first!
+{% endif %}
+{% endblock %}

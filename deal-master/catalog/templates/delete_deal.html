@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Delete Deal{% endblock %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+  {% if user.id == deal.author.id %}
+    <h1>Delete Deal</h1>
+    <br/>
+    <h3>Delete: {{ deal.title }}</h3>
+    <br/>
+    <div class="mb-3">
+    <form method ="POST">
+      {% csrf_token %}
+      <strong>Are you sure?</strong><br/><br/>
+      <button class="btn btn-primary">Delete</button>
+    </div>
+  {% endif %}
+{% else %}
+
+Gotta login first!
+
+{% endif %}
+{% endblock %}

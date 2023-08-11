@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ deal.title }}{% endblock %}
+
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&display=swap');
+
+  .h1 {
+    font-family: 'PT Serif', serif;
+    font-size: 2.55rem;
+    line-height: 2.6rem;
+    letter-spacing: -0.063px;
+  }
+
+  h2 {
+    font-family: 'PT Serif', serif;
+    font-size: 1.9rem;
+    line-height: 2.6rem;
+    letter-spacing: -0.063px;
+    font-weight: 700;
+    padding-top: 48px;
+  }
+
+  p {
+    font-family: 'PT Serif', serif;
+    line-height: 2rem;
+    font-size: 1.3rem
+  }
+
+  @media screen and (min-width: 600px) {
+    .children form {
+      margin-left: -48px;
+      /* will touch very left side */
+    }
+
+    .children .children form {
+      margin-left: -96px;
+      /* will touch very left side */
+    }
+  }
+
+  .avatar_single {
+    height: 48px;
+    width: 48px;
+    background-color: #000;
+    border-radius: 50%;
+    display: inline-block;
+
+  }
+
+  .smaller {
+    font-size: 0.8rem;
+  }
+</style>
+
+  <h1>{{ deal.title }}</h1>
+  {% if user.is_authenticated %}
+    {% if user.id == deal.author.id %}
+      <small>
+      <a href="{% url 'update_deal' deal.pk %}">Edit</a>
+      <a href="{% url 'delete_deal' deal.pk %}">Delete</a> <br/>
+      </small>
+    {% endif %}
+  {% endif %}
+   Price: ${{deal.price}} <br/>
+   Date Posted : {{ deal.date_posted }}<br/>
+   {{ deal.store }}
+
+  <hr>
+  <br/>
+
+  <div class="clearfix">
+    {% if deal.header_image %}
+      <img src="{{ deal.header_image.url }}" class="col-md-5 float-md-end mb-3 ms-md-3" width="280" height="280" maxclass="img-fluid rounded-start">
+    {% endif %}
+
+    <br/><br/>
+    {{ deal.summary|safe}}
+  </div>
+<br/><br/>
+
+<!-- This is a comment
+  <form action = "{% url 'like_deal' deal.pk %}"
+  method="POST">
+  <span class="" id="like_count">{{deal.like_count}}</span>
+    {% csrf_token %}
+    {% if user.is_authenticated %}
+
+      {% if liked %}
+        <button type="submit", id="like-button", name="deal_id", value
+        ="{{ deal.id }}", class="btn btn-primary">Unlike</button>
+      {% else %}
+        <button type="submit", id="like-button", name="deal_id", value
+        ="{{ deal.id }}", class="btn btn-primary">Like</button>
+      {% endif %}
+      - {{ deal.like_count }} Likes
+    {% else %}
+      <a class="btn btn-primary" href="{% url 'login' %}" role="button">Like</a>
+    {% endif %}
+  </form>
+-->
+
+<div class="d-flex">
+  {% if user.is_authenticated %}
+    {% if liked %}
+      <span class="" id="like_count">{{deal.like_count}}</span>
+      <button class="btn btn-link text-dark p-0 border-0 btn-outline-link shadow-none like-button" value="{{ deal.id }}">
+        <i class="fas fa-heart" style="background-color: white; font-size: 1.5em; margin-left: 5px;"></i>
+      </button>
+    {% else %}
+      <span class="" id="like_count">{{deal.like_count}}</span>
+      <button class="btn btn-link text-dark p-0 border-0 btn-outline-link shadow-none like-button" value="{{ deal.id }}">
+        <i class="far fa-heart" style="background-color: white; font-size: 1.5em; margin-left: 5px;"></i>
+      </button>
+    {% endif %}
+  {% else %}
+    <div class="pr-2">
+    <span class="" id="like_count">{{deal.like_count}}</span>
+    <a href="{% url 'login' %}" class="btn btn-link text-dark p-0 border-0 btn-outline-light"
+      value="{{deal.id}}">
+      <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-heart" fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd"
+          d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+      </svg>
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+  <br/><br/>
+
+  <div class="card mb-3">
+    <div class="row g-0">
+      <div class="col-md-2">
+        {% if deal.author.profile.profile_pic %}
+              <img src="{{ deal.author.profile.profile_pic.url }}" width="128" height="128" maxclass="img-fluid rounded-start">
+        {% else %}
+              <img src="{% static 'catalog/images/default_profile.png' %}" width="128" height="128" maxclass="img-fluid rounded-start">
+        {% endif %}
+      </div>
+      <div class="col-md-10">
+        <div class="card-body">
+
+          <h5 class="card-title"><a href="{% url 'show_profile_page' deal.author.profile.id %}">{{ deal.author.username }}</a></h5>
+          <p class="card-text">{{ deal.author.profile.bio }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+<br/><br/>
+
+<form action="{% url 'add_comment' deal.pk %}" enctype = "multiparty/form-data" method = "POST">
+  {% csrf_token %}
+  <h3>Write a New Comment</h3>
+        {{ form.content }}
+  <br/>
+  <button class="btn btn-primary", value="{{ deal.id }}", type="submit">Post</button>
+</form>
+<br/><br/>
+{% if not deal.comments.all %}
+  No comments yet...
+{% else %}
+  <br/><br/>
+    {% for comment in deal.comments.all %}
+      <strong>
+        {{ comment.name }} -
+        {{ comment.date_added }}
+      </strong>
+      <br/>
+      {{ comment.content }}
+      <hr>
+    {% endfor %}
+{% endif %}
+<br/><br/>
+
+<script>
+  $(document).on('click', '.like-button', function (e) {
+    e.preventDefault();
+    $.ajax({
+      type: 'POST',
+      url: '{% url "like_deal" deal.id %}',
+      data: {
+        postid: $('.like-button').val(),
+        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+        action: 'post'
+      },
+      success: function (json) {
+        document.getElementById("like_count").innerHTML = json['result'];
+        $('i').toggleClass('far fas');
+  //    $("#like-button").find('.fa-heart').css("color", "red");
+      },
+      error: function (xhr, errmsg, err) {
+
+      }
+    });
+  })
+</script>
+{% endblock %}
